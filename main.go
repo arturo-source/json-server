@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"flag"
 	"net/http"
 	"os"
 	"strconv"
@@ -10,7 +11,7 @@ import (
 )
 
 var (
-	port   = ":8090"
+	port   = "8090"
 	dbName = "db.json"
 	db     = make(map[string][]interface{})
 )
@@ -256,12 +257,16 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	flag.StringVar(&dbName, "db", "db.json", "database filename")
+	flag.StringVar(&port, "port", "8090", "port where backend server will listen")
+	flag.Parse()
+
 	err := ReadDB()
 	if err != nil {
 		panic(err)
 	}
 
-	err = http.ListenAndServe(port, http.HandlerFunc(Handler))
+	err = http.ListenAndServe(":"+port, http.HandlerFunc(Handler))
 	if err != nil {
 		panic(err)
 	}
